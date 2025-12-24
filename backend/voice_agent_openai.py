@@ -1,7 +1,10 @@
 import logging
 import os
 import ssl
-import certifi
+try:
+    import certifi
+except ImportError:
+    certifi = None
 from dotenv import load_dotenv
 
 from livekit.agents import JobContext, JobProcess, WorkerOptions, cli
@@ -25,9 +28,10 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 load_dotenv()
 
 # Fix SSL certificate issue on Windows
-ssl._create_default_https_context = lambda: ssl.create_default_context(cafile=certifi.where())
-os.environ['SSL_CERT_FILE'] = certifi.where()
-os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
+if certifi:
+    ssl._create_default_https_context = lambda: ssl.create_default_context(cafile=certifi.where())
+    os.environ['SSL_CERT_FILE'] = certifi.where()
+    os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
 
 logger = logging.getLogger("voice-assistant")
 
@@ -45,11 +49,12 @@ Settings.llm = llm
 Settings.embed_model = embed_model
 
 # check if storage already exists
-PERSIST_DIR = "./chat-engine-storage"
+# check if storage already exists
+PERSIST_DIR = "../chat-engine-storage"
 if not os.path.exists(PERSIST_DIR):
-    print("Creating new index from documents in 'docs'...")
+    print("Creating new index from documents in '../docs'...")
     # load the documents and create the index
-    documents = SimpleDirectoryReader("docs").load_data()
+    documents = SimpleDirectoryReader("../docs").load_data()
     print(f"Loaded {len(documents)} documents.")
     index = VectorStoreIndex.from_documents(documents)
     print("Index created.")

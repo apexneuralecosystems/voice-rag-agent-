@@ -7,8 +7,7 @@ module.exports = {
       cwd: require("path").join(process.cwd(), "backend"),
       interpreter: "none",
       env: {
-        ENV: "production",
-        PORT: 8103
+        ENV: "production"
       },
       instances: 1,
       autorestart: true,
@@ -27,7 +26,7 @@ module.exports = {
       cwd: "./frontend",
       env: {
         NODE_ENV: "production",
-        PORT: 3020,
+        PORT: 8103,
         HOST: "0.0.0.0"
       },
       instances: 1,

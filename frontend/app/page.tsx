@@ -14,7 +14,7 @@ import {
 import { ConnectionState, Track } from "livekit-client";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Activity, Shield, Cpu, Zap, Signal, Mic, LogOut } from "lucide-react";
+import { Activity, Shield, Cpu, Zap, Signal, Mic, LogOut, ArrowLeft } from "lucide-react";
 
 export default function Home() {
   const [token, setToken] = useState("");
@@ -36,7 +36,7 @@ export default function Home() {
       {/* CRT Overlays */}
       <div className="scanlines" />
       <div className="crt-overlay" />
-      
+
       {/* Corner HUD Elements */}
       <div className="hud-corner hud-tl" />
       <div className="hud-corner hud-tr" />
@@ -53,24 +53,24 @@ export default function Home() {
             className="z-10 text-center space-y-12 max-w-4xl px-4"
           >
             <div className="hologram-bg" />
-            
-              <div className="space-y-4 w-full">
-                <motion.div
-                  initial={{ y: 20 }}
-                  animate={{ y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="flex items-center justify-center gap-4 mb-8"
-                >
-                  <Cpu className="text-red-500 w-8 h-8" />
-                  <div className="h-px w-24 bg-red-500/30" />
-                  <Zap className="text-red-500 w-8 h-8" />
-                </motion.div>
 
-                <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black glitch-text tracking-tighter text-white break-words">
-                  AGENT<span className="text-red-600">ZERO</span>
-                </h1>
-                
-                <div className="flex justify-between items-center w-full px-4 max-w-sm mx-auto">
+            <div className="space-y-4 w-full">
+              <motion.div
+                initial={{ y: 20 }}
+                animate={{ y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="flex items-center justify-center gap-4 mb-8"
+              >
+                <Cpu className="text-red-500 w-8 h-8" />
+                <div className="h-px w-24 bg-red-500/30" />
+                <Zap className="text-red-500 w-8 h-8" />
+              </motion.div>
+
+              <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black glitch-text tracking-tighter text-white break-words">
+                AGENT<span className="text-red-600">ZERO</span>
+              </h1>
+
+              <div className="flex justify-between items-center w-full px-4 max-w-sm mx-auto">
                 <span className="hud-label flex items-center gap-2">
                   <Activity className="w-3 h-3" /> NEURAL LINK: READY
                 </span>
@@ -114,17 +114,17 @@ export default function Home() {
             className="w-full h-full min-h-screen"
           >
             <LiveKitRoom
-                token={token}
-                serverUrl={url}
-                connect={true}
-                audio={true}
-                video={false}
-                className="flex flex-col items-center justify-between min-h-screen relative w-full p-8 overflow-hidden"
-              >
+              token={token}
+              serverUrl={url}
+              connect={true}
+              audio={true}
+              video={false}
+              className="flex flex-col items-center justify-between min-h-screen relative w-full p-8 overflow-hidden"
+            >
               <div className="hologram-bg" />
 
               {/* Top Status Bar */}
-              <motion.div 
+              <motion.div
                 initial={{ y: -50 }}
                 animate={{ y: 0 }}
                 className="w-full flex justify-center z-10 pt-4"
@@ -134,7 +134,7 @@ export default function Home() {
 
               {/* Main Reactor Core */}
               <div className="flex-1 flex items-center justify-center w-full relative z-10">
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   className="reactor-container"
@@ -151,7 +151,7 @@ export default function Home() {
               </div>
 
               {/* Custom Neural Control Bar */}
-              <motion.div 
+              <motion.div
                 initial={{ y: 50 }}
                 animate={{ y: 0 }}
                 className="w-full flex justify-center z-20 pb-12"
@@ -191,7 +191,15 @@ function NeuralControlBar() {
   return (
     <div className="neural-pill">
       <div className="neural-pill-content">
-        <button 
+        <button
+          onClick={handleDisconnect}
+          className="custom-exit-button group"
+          title="Back to Home"
+        >
+          <ArrowLeft className="w-6 h-6 text-red-500/40 group-hover:text-red-500 transition-colors" />
+        </button>
+
+        <button
           onClick={toggleMic}
           className="custom-mic-button group"
           title={isMuted ? "Unmute" : "Mute"}
@@ -211,8 +219,8 @@ function NeuralControlBar() {
             </span>
           </div>
           <div className="h-px bg-red-500/10 w-full relative">
-            <motion.div 
-              animate={{ 
+            <motion.div
+              animate={{
                 x: ["0%", "100%", "0%"],
                 opacity: isMuted ? 0.2 : 1
               }}
@@ -220,7 +228,7 @@ function NeuralControlBar() {
               className="absolute top-0 left-0 w-16 h-px bg-red-500 shadow-[0_0_10px_#ff0000]"
             />
             {!isMuted && (
-              <motion.div 
+              <motion.div
                 animate={{ opacity: [0.2, 0.5, 0.2] }}
                 transition={{ duration: 1, repeat: Infinity }}
                 className="absolute inset-0 bg-red-500/5"
@@ -228,14 +236,6 @@ function NeuralControlBar() {
             )}
           </div>
         </div>
-
-        <button 
-          onClick={handleDisconnect}
-          className="custom-exit-button group"
-          title="Disconnect"
-        >
-          <LogOut className="w-6 h-6 text-red-500/40 group-hover:text-red-500 transition-colors" />
-        </button>
       </div>
     </div>
   );
