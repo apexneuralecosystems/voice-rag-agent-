@@ -1,0 +1,40 @@
+module.exports = {
+    apps: [
+        {
+            name: 'voice-agent-backend',
+            script: 'python',
+            args: 'voice_agent_openai.py start',
+            cwd: require('path').join(process.cwd(), 'backend'),
+            interpreter: 'none',
+            env: {
+                NODE_ENV: 'production',
+            },
+            instances: 1,
+            autorestart: true,
+            watch: false,
+            max_memory_restart: '1G',
+            error_file: './logs/backend-error.log',
+            out_file: './logs/backend-out.log',
+            log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+            merge_logs: true,
+        },
+        {
+            name: 'voice-agent-frontend',
+            script: 'npm',
+            args: 'start',
+            cwd: './frontend',
+            env: {
+                NODE_ENV: 'production',
+                PORT: 3000,
+            },
+            instances: 1,
+            autorestart: true,
+            watch: false,
+            max_memory_restart: '512M',
+            error_file: './logs/frontend-error.log',
+            out_file: './logs/frontend-out.log',
+            log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+            merge_logs: true,
+        },
+    ],
+};

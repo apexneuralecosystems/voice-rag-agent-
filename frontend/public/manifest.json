@@ -1,0 +1,46 @@
+{
+    "name": "Voice Agent RAG - AI Voice Assistant",
+    "short_name": "Voice Agent",
+    "description": "Real-time voice-powered RAG (Retrieval-Augmented Generation) agent with LiveKit, Cartesia, and Deepgram",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1a1b26",
+    "theme_color": "#00D4FF",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icon.svg",
+            "sizes": "32x32",
+            "type": "image/svg+xml"
+        }
+    ],
+    "categories": [
+        "productivity",
+        "utilities",
+        "business"
+    ],
+    "shortcuts": [
+        {
+            "name": "Start Voice Chat",
+            "short_name": "Voice Chat",
+            "description": "Start a new voice conversation",
+            "url": "/",
+            "icons": [
+                {
+                    "src": "/icon.svg",
+                    "sizes": "32x32",
+                    "type": "image/svg+xml"
+                }
+            ]
+        }
+    ],
+    "screenshots": [],
+    "related_applications": [],
+    "prefer_related_applications": false
+}

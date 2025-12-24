@@ -1,0 +1,62 @@
+# ============================================
+# Voice Agent RAG - Python Dependencies
+# ============================================
+# This file contains all Python dependencies for the Voice Agent RAG backend.
+# Install with: pip install -r requirements.txt
+
+# --------------------------------------------
+# Core LiveKit Dependencies
+# --------------------------------------------
+livekit==0.22.0
+livekit-agents==0.12.17
+livekit-api==0.8.2
+livekit-protocol==0.9.2
+
+# --------------------------------------------
+# LiveKit Plugins
+# --------------------------------------------
+livekit-plugins-cartesia==0.4.10
+livekit-plugins-deepgram==0.7.0
+livekit-plugins-llama-index==0.2.3
+livekit-plugins-openai==0.11.2
+livekit-plugins-silero==0.7.5
+
+# --------------------------------------------
+# Voice & Audio Processing
+# --------------------------------------------
+cartesia==1.4.0
+
+# --------------------------------------------
+# LLM & RAG (LlamaIndex)
+# --------------------------------------------
+llama-index-core==0.12.24.post1
+llama-index-llms-openai==0.3.25
+llama-index-llms-openai-like==0.3.2
+llama-index-embeddings-huggingface==0.5.2
+
+# --------------------------------------------
+# AI/ML APIs
+# --------------------------------------------
+openai==1.65.2
+
+# --------------------------------------------
+# Utilities
+# --------------------------------------------
+python-dotenv==1.0.1
+certifi  # For SSL certificate handling on Windows
+
+# --------------------------------------------
+# Optional Production Dependencies
+# --------------------------------------------
+# Uncomment for production deployment:
+# gunicorn==21.2.0  # Not needed (LiveKit has its own server)
+# uvicorn==0.27.0   # Not needed (LiveKit has its own server)
+
+# --------------------------------------------
+# Development Dependencies
+# --------------------------------------------
+# Uncomment for development:
+# pytest==7.4.3
+# black==23.12.1
+# flake8==7.0.0
+# ipython==8.19.0

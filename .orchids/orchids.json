@@ -1,0 +1,8 @@
+{
+  "projectId": "f53446a5-abbd-4ac9-af57-7d832e8fc7c6",
+  "createdAt": 1766253350562,
+  "startupCommands": [
+    "pip install -r requirements.txt; python voice_agent_openai.py dev",
+    "cd frontend; npm install; npm run dev"
+  ]
+}

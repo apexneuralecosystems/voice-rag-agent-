@@ -1,0 +1,19 @@
+[Unit]
+Description=Voice Agent RAG - LiveKit Worker
+After=network.target
+
+[Service]
+Type=simple
+User=youruser
+WorkingDirectory=/path/to/Voice-Agent-RAG/backend
+Environment="PATH=/path/to/Voice-Agent-RAG/venv/bin"
+ExecStart=/path/to/Voice-Agent-RAG/venv/bin/python voice_agent_openai.py start
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=append:/var/log/voice-agent/output.log
+StandardError=append:/var/log/voice-agent/error.log
+
+[Install]
+WantedBy=multi-user.target

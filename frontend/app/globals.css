@@ -1,0 +1,306 @@
+@import "tailwindcss";
+
+:root {
+  --bg-deep: #0a0a0a;
+  --primary: #ff0000;
+  --primary-glow: rgba(255, 0, 0, 0.6);
+  --secondary: #00f2ff;
+  --secondary-glow: rgba(0, 242, 255, 0.6);
+  --glass-border: rgba(255, 0, 0, 0.3);
+  --font-orbitron: var(--font-orbitron);
+  --font-rajdhani: var(--font-rajdhani);
+}
+
+@theme {
+  --color-primary: var(--primary);
+  --font-orbitron: var(--font-orbitron);
+  --font-rajdhani: var(--font-rajdhani);
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: #fff;
+  font-family: var(--font-rajdhani), sans-serif;
+  overflow: hidden;
+  margin: 0;
+}
+
+/* --- CRT & Scanline Effects --- */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.1) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    circle,
+    transparent 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  z-index: 51;
+  pointer-events: none;
+}
+
+/* --- Animations --- */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
+
+/* --- Holographic Floor --- */
+.hologram-bg {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(var(--glass-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: center bottom;
+  opacity: 0.15;
+  transform: perspective(1000px) rotateX(60deg);
+  transform-origin: center bottom;
+  z-index: 0;
+  mask-image: radial-gradient(circle at center, black, transparent 80%);
+}
+
+/* --- Reactor Core --- */
+.reactor-container {
+  position: relative;
+  width: min(400px, 50vh);
+  height: min(400px, 50vh);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 20px var(--primary-glow));
+}
+
+.reactor-ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: pulse-ring 4s ease-in-out infinite;
+}
+
+.reactor-ring-dashed {
+  position: absolute;
+  inset: -20px;
+  border: 1px dashed var(--primary);
+  border-radius: 50%;
+  animation: spin-slow 40s linear infinite;
+  opacity: 0.3;
+}
+
+.reactor-ring-data {
+  position: absolute;
+  inset: 15%;
+  border: 4px solid var(--primary);
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin-reverse 20s linear infinite;
+  opacity: 0.6;
+}
+
+.reactor-core-bg {
+  position: absolute;
+  inset: 30%;
+  background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(20px);
+}
+
+/* --- HUD Elements --- */
+.hud-corner {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-color: var(--primary);
+  opacity: 0.5;
+}
+
+.hud-tl { top: 40px; left: 40px; border-top-width: 2px; border-left-width: 2px; }
+.hud-tr { top: 40px; right: 40px; border-top-width: 2px; border-right-width: 2px; }
+.hud-bl { bottom: 40px; left: 40px; border-bottom-width: 2px; border-left-width: 2px; }
+.hud-br { bottom: 40px; right: 40px; border-bottom-width: 2px; border-right-width: 2px; }
+
+/* --- Neural Control Bar --- */
+.neural-pill {
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  box-shadow: 0 0 40px rgba(255, 0, 0, 0.1);
+  width: min(500px, 95vw);
+  height: 80px;
+  border-radius: 40px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+}
+
+.neural-pill-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 1.5rem;
+  height: 100%;
+}
+
+@media (min-width: 640px) {
+  .neural-pill-content {
+    padding: 0 2rem;
+  }
+}
+
+.neural-pill-status {
+  flex: 1;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .neural-pill-status {
+    padding: 0 3rem;
+  }
+}
+
+.custom-mic-button {
+  all: unset;
+  cursor: pointer;
+  width: 48px;
+  height: 48px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 5;
+}
+
+.mic-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mic-inner.active {
+  background: var(--primary);
+  box-shadow: 0 0 25px var(--primary-glow);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.custom-exit-button {
+  all: unset;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  background: rgba(255, 0, 0, 0.05);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+  z-index: 5;
+}
+
+.custom-exit-button:hover {
+  background: rgba(255, 0, 0, 0.15);
+  border-color: rgba(255, 0, 0, 0.3);
+  transform: translateX(2px);
+}
+
+/* --- Hide LiveKit Defaults --- */
+.lk-button, .lk-disconnect-button {
+  display: none !important;
+}
+
+/* --- Typography --- */
+.font-orbitron { font-family: var(--font-orbitron), sans-serif; }
+.font-rajdhani { font-family: var(--font-rajdhani), sans-serif; }
+
+.glitch-text {
+  font-family: var(--font-orbitron), sans-serif;
+  text-shadow: 2px 2px 0px rgba(255, 0, 0, 0.5), -2px -2px 0px rgba(0, 242, 255, 0.3);
+  letter-spacing: 4px;
+}
+
+.hud-label {
+  font-family: var(--font-orbitron), sans-serif;
+  font-size: 11px;
+  color: var(--primary);
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+
+.status-badge {
+  background: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  padding: 4px 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- Bar Visualizer --- */
+.lk-audio-bar {
+  background-color: var(--primary) !important;
+  box-shadow: 0 0 10px var(--primary-glow);
+  width: 6px !important;
+  border-radius: 3px !important;
+}
+
+/* --- Hide default LiveKit styles that interfere --- */
+.lk-control-bar, .lk-button-group {
+  display: none !important;
+}
+
+.lk-start-audio-button {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 100 !important;
+  background: var(--primary) !important;
+  color: white !important;
+  font-family: var(--font-orbitron) !important;
+  padding: 20px 40px !important;
+  border-radius: 4px !important;
+  border: 1px solid white !important;
+  text-transform: uppercase !important;
+  letter-spacing: 4px !important;
+}
