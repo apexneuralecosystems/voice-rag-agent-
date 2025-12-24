@@ -32,7 +32,7 @@ cartesia==1.4.0
 llama-index-core==0.12.24.post1
 llama-index-llms-openai==0.3.25
 llama-index-llms-openai-like==0.3.2
-llama-index-embeddings-huggingface==0.5.2
+llama-index-embeddings-huggingface==0.4.0
 
 # --------------------------------------------
 # AI/ML APIs
