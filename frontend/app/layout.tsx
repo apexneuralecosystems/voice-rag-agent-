@@ -32,12 +32,6 @@ export const metadata: Metadata = {
     ],
   },
 
-  // Theme and App Configuration
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#00D4FF' },
-    { media: '(prefers-color-scheme: dark)', color: '#1a1b26' },
-  ],
-
   // PWA Configuration
   manifest: '/manifest.json',
 
@@ -56,13 +50,17 @@ export const metadata: Metadata = {
     title: "Voice Agent RAG",
     description: "Real-time AI-Powered Voice Assistant",
   },
+};
 
-  // Viewport
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-  },
+// Viewport configuration (Next.js 14+ requires separate export)
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#00D4FF' },
+    { media: '(prefers-color-scheme: dark)', color: '#1a1b26' },
+  ],
 };
 
 export default function RootLayout({

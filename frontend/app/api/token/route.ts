@@ -1,4 +1,4 @@
-import { AccessToken } from "livekit-server-sdk";
+import { AccessToken, RoomAgentDispatch } from "livekit-server-sdk";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -20,7 +20,15 @@ export async function GET(req: NextRequest) {
     ttl: "10m",
   });
 
-  at.addGrant({ roomJoin: true, room: roomName, canPublish: true, canSubscribe: true });
+  // Grant room access with agent dispatch enabled
+  at.addGrant({
+    roomJoin: true,
+    room: roomName,
+    canPublish: true,
+    canSubscribe: true,
+    // Enable agent dispatch - this tells LiveKit to dispatch an agent when this participant joins
+    agent: true,
+  });
 
   return NextResponse.json({
     accessToken: await at.toJwt(),

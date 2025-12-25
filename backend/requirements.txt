@@ -5,21 +5,21 @@
 # Install with: pip install -r requirements.txt
 
 # --------------------------------------------
-# Core LiveKit Dependencies
+# Core LiveKit Dependencies (pinned for stability)
 # --------------------------------------------
-livekit==0.22.0
-livekit-agents==0.12.17
-livekit-api==0.8.2
-livekit-protocol==0.9.2
+livekit>=0.18.0
+livekit-agents>=1.0.0
+livekit-api>=0.7.0
+livekit-protocol>=0.7.0
 
 # --------------------------------------------
-# LiveKit Plugins
+# LiveKit Plugins (pinned for stability)
 # --------------------------------------------
-livekit-plugins-cartesia==0.4.10
-livekit-plugins-deepgram==0.7.0
-livekit-plugins-llama-index==0.2.3
-livekit-plugins-openai==0.11.2
-livekit-plugins-silero==0.7.5
+livekit-plugins-cartesia>=0.4.0
+livekit-plugins-deepgram>=0.6.0
+livekit-plugins-llama-index>=0.2.0
+livekit-plugins-openai>=0.10.0
+livekit-plugins-silero>=0.7.0
 
 # --------------------------------------------
 # Voice & Audio Processing
@@ -37,7 +37,7 @@ llama-index-embeddings-huggingface==0.4.0
 # --------------------------------------------
 # AI/ML APIs
 # --------------------------------------------
-openai==1.65.2
+openai>=1.68.0
 
 # --------------------------------------------
 # Utilities

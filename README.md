@@ -28,7 +28,7 @@ Voice-Agent-RAG/
 ## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:
-- **Python 3.11 or later** - [Download here](https://www.python.org/)
+- **Python 3.11 or 3.12** (NOT 3.14 - see note below) - [Download here](https://www.python.org/)
 - **Node.js 18 or later** - [Download here](https://nodejs.org/)
 - **Git** - [Download here](https://git-scm.com/)
 
@@ -104,16 +104,17 @@ Open a terminal window and run:
 # Option 1: Using the script (Windows)
 scripts\run_backend.bat
 
-# Option 2: Manual  (Windows)
-venv\Scripts\activate
+# Option 2: Manual (Windows with Python 3.12)
 cd backend
-python voice_agent_openai.py dev
+py -3.12 voice_agent_openai.py dev
 
 # Option 3: Manual (Linux/macOS)
 source venv/bin/activate
 cd backend
-python voice_agent_openai.py dev
+python3.12 voice_agent_openai.py dev
 ```
+
+> ⚠️ **Important:** You MUST use Python 3.11 or 3.12. Python 3.14 has compatibility issues with LiveKit packages.
 
 **For Production:**
 ```bash
@@ -489,25 +490,346 @@ docker-compose down
 
 ## 🔧 Troubleshooting
 
-### SSL Certificate Issues (Windows)
+### Common Setup Issues
+
+#### SSL Certificate Issues (Windows)
 If you encounter SSL certificate errors, use the `run_backend.bat` file which automatically sets:
 ```batch
 set REQUESTS_CA_BUNDLE=
 set SSL_CERT_FILE=
 ```
 
-### Port Already in Use
+#### Port Already in Use
 If you get a "port already in use" error:
-- Frontend: Check and kill any process using port 3000
+- Frontend: Check and kill any process using port 8103
 - Backend: Check the LiveKit agent configuration for port settings
 
-### Virtual Environment Not Activating
+```bash
+# Windows - Find and kill process on port
+netstat -ano | findstr :8103
+taskkill /PID <PID> /F
+
+# Linux/macOS
+lsof -i :8103
+kill -9 <PID>
+```
+
+#### Virtual Environment Not Activating
 Make sure you're in the project root directory and the `venv` folder exists. Recreate if necessary:
 ```bash
 rmdir /s venv  # Windows
 # rm -rf venv  # macOS/Linux
 python -m venv venv
 ```
+
+#### Python 3.14 Compatibility Issues
+**Error:** `AttributeError` when importing LiveKit plugins (silero, deepgram, etc.)
+
+**Cause:** Python 3.14 has namespace package issues with LiveKit plugins.
+
+**Solution:** Use Python 3.11 or 3.12 instead:
+```bash
+# Windows - use py launcher to select version
+py -3.12 voice_agent_openai.py dev
+
+# Linux/macOS - install Python 3.12
+sudo apt install python3.12 python3.12-venv  # Ubuntu/Debian
+python3.12 -m venv venv
+source venv/bin/activate
+```
+
+#### Agent Not Speaking / No Audio Output
+**Symptoms:** 
+- Frontend shows "NEURAL LINK ONLINE" but agent doesn't greet
+- Console shows `trackID: undefined`
+
+**Causes & Solutions:**
+1. **Backend not receiving jobs**: Verify `agent: true` is in the token grant (`frontend/app/api/token/route.ts`)
+2. **Wrong Python version**: Use Python 3.11 or 3.12, not 3.14
+3. **LiveKit Agents API mismatch**: Ensure code uses `AgentSession.start()` pattern (already fixed in current codebase)
+
+---
+
+## 🚨 Server Deployment Errors & Solutions
+
+### 1. LiveKit Connection Errors
+
+#### Error: `Failed to connect to LiveKit server`
+**Cause:** Invalid LiveKit credentials or network issues.
+**Solution:**
+```bash
+# Verify your .env file has correct values:
+LIVEKIT_URL=wss://your-project.livekit.cloud  # Must start with wss://
+LIVEKIT_API_KEY=your_api_key
+LIVEKIT_API_SECRET=your_api_secret
+
+# Test connectivity
+curl -I https://your-project.livekit.cloud
+```
+
+#### Error: `WebSocket connection failed`
+**Cause:** Firewall blocking WebSocket connections.
+**Solution:**
+```bash
+# Allow outbound connections on ports 443, 7880-7881
+sudo ufw allow out 443/tcp
+sudo ufw allow out 7880:7881/tcp
+```
+
+---
+
+### 2. Python/Dependency Errors
+
+#### Error: `ModuleNotFoundError: No module named 'livekit'`
+**Cause:** Dependencies not installed or wrong Python environment.
+**Solution:**
+```bash
+# Ensure virtual environment is active
+source venv/bin/activate  # Linux/macOS
+venv\Scripts\activate     # Windows
+
+# Reinstall dependencies
+pip install -r backend/requirements.txt
+```
+
+#### Error: `livekit.agents.voice.Agent not found`
+**Cause:** Old LiveKit Agents version (needs 1.0+).
+**Solution:**
+```bash
+pip install --upgrade livekit-agents>=1.0.0
+```
+
+#### Error: `SSL: CERTIFICATE_VERIFY_FAILED`
+**Cause:** SSL certificate issues, common on Windows.
+**Solution:**
+```bash
+# Install certifi
+pip install certifi
+
+# Or set environment variables
+export SSL_CERT_FILE=$(python -c "import certifi; print(certifi.where())")
+export REQUESTS_CA_BUNDLE=$(python -c "import certifi; print(certifi.where())")
+```
+
+---
+
+### 3. Memory & Resource Errors
+
+#### Error: `MemoryError` or `Killed`
+**Cause:** HuggingFace embedding model requires ~2GB RAM.
+**Solution:**
+```bash
+# Check available memory
+free -h  # Linux
+Get-Process | Sort-Object WorkingSet -Descending | Select-Object -First 5  # Windows
+
+# Add swap space (Linux)
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+```
+
+#### Error: `torch.cuda.OutOfMemoryError`
+**Cause:** GPU memory exhausted (if using CUDA).
+**Solution:**
+```python
+# Force CPU-only mode in voice_agent_openai.py
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+```
+
+---
+
+### 4. API Key & Authentication Errors
+
+#### Error: `401 Unauthorized` from OpenRouter/Cartesia/Deepgram
+**Cause:** Invalid or expired API keys.
+**Solution:**
+```bash
+# Verify API keys are set correctly
+cat .env | grep API_KEY
+
+# Test API key directly
+curl -H "Authorization: Bearer $OPENROUTER_API_KEY" https://openrouter.ai/api/v1/models
+```
+
+#### Error: `CARTESIA_API_KEY is not set`
+**Cause:** Environment variables not loaded.
+**Solution:**
+```bash
+# Ensure .env file exists in project root
+ls -la .env
+
+# Source the .env file manually
+export $(cat .env | xargs)
+```
+
+---
+
+### 5. Frontend Build/Runtime Errors
+
+#### Error: `ENOENT: no such file or directory, open '.env.local'`
+**Cause:** Missing frontend environment file.
+**Solution:**
+```bash
+cd frontend
+cp ../.env .env.local
+# Or create with required variables:
+echo "LIVEKIT_API_KEY=your_key" > .env.local
+echo "LIVEKIT_API_SECRET=your_secret" >> .env.local
+echo "LIVEKIT_URL=your_url" >> .env.local
+```
+
+#### Error: `Error: listen EADDRINUSE: address already in use :::8103`
+**Cause:** Port 8103 is already in use.
+**Solution:**
+```bash
+# Find and kill the process
+# Linux/macOS
+lsof -ti:8103 | xargs kill -9
+
+# Windows
+netstat -ano | findstr :8103
+taskkill /PID <PID> /F
+```
+
+---
+
+### 6. PM2/Process Manager Errors
+
+#### Error: `pm2: command not found`
+**Cause:** PM2 not installed globally.
+**Solution:**
+```bash
+npm install -g pm2
+```
+
+#### Error: `[PM2] Spawning PM2 daemon with pm2_home`
+**Cause:** PM2 daemon starting for first time (not an error).
+**Solution:** This is normal. PM2 creates its daemon on first run.
+
+#### Error: `Script not found`
+**Cause:** Wrong working directory in PM2 config.
+**Solution:**
+```bash
+# Edit deployment/ecosystem.config.js
+# Ensure cwd paths are correct for your server
+
+# Or start manually with absolute paths
+pm2 start /full/path/to/backend/voice_agent_openai.py --interpreter python
+```
+
+---
+
+### 7. Systemd Service Errors
+
+#### Error: `Failed to start voice-agent.service: Unit not found`
+**Cause:** Service file not copied to systemd.
+**Solution:**
+```bash
+sudo cp deployment/voice-agent.service /etc/systemd/system/
+sudo systemctl daemon-reload
+```
+
+#### Error: `Main process exited, code=exited, status=1/FAILURE`
+**Cause:** Python script error or missing dependencies.
+**Solution:**
+```bash
+# Check logs
+sudo journalctl -u voice-agent -n 50
+
+# Test manually first
+cd /path/to/project/backend
+source ../venv/bin/activate
+python voice_agent_openai.py dev
+```
+
+---
+
+### 8. Network & Firewall Issues
+
+#### Error: `Connection refused` or `Connection timed out`
+**Cause:** Firewall blocking connections.
+**Solution:**
+```bash
+# Linux - Open required ports
+sudo ufw allow 8103/tcp  # Frontend
+sudo ufw allow 443/tcp   # HTTPS/WSS
+
+# Check firewall status
+sudo ufw status
+```
+
+#### Error: `CORS policy: No 'Access-Control-Allow-Origin'`
+**Cause:** Frontend and backend on different origins.
+**Solution:** Configure your reverse proxy (Nginx) to handle CORS:
+```nginx
+location /api {
+    add_header 'Access-Control-Allow-Origin' '*';
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+}
+```
+
+---
+
+### 9. Docker Deployment Errors
+
+#### Error: `Cannot connect to the Docker daemon`
+**Cause:** Docker service not running.
+**Solution:**
+```bash
+# Start Docker
+sudo systemctl start docker
+
+# Or on Windows/macOS, start Docker Desktop
+```
+
+#### Error: `ERROR: for backend  Cannot start service`
+**Cause:** Build failed or missing environment variables.
+**Solution:**
+```bash
+# Rebuild with no cache
+docker-compose build --no-cache
+
+# Check .env file exists
+docker-compose config
+```
+
+---
+
+### 10. Quick Diagnostic Commands
+
+```bash
+# Check if backend is running
+ps aux | grep voice_agent  # Linux/macOS
+tasklist | findstr python  # Windows
+
+# Check ports in use
+netstat -tulpn | grep LISTEN  # Linux
+netstat -ano | findstr LISTENING  # Windows
+
+# Test LiveKit connectivity
+curl -v wss://your-project.livekit.cloud
+
+# Check Python version
+python --version  # Should be 3.11+
+
+# Check Node.js version
+node --version   # Should be 18+
+
+# View PM2 logs
+pm2 logs --lines 100
+
+# View systemd logs
+sudo journalctl -u voice-agent -f
+
+# Check disk space
+df -h  # Linux
+Get-PSDrive  # Windows
+```
+
+---
 
 ## 📚 Additional Resources
 

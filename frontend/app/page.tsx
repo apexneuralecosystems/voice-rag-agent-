@@ -8,26 +8,37 @@ import {
   useConnectionState,
   useVoiceAssistant,
   useLocalParticipant,
-  DisconnectButton,
-  TrackToggle,
 } from "@livekit/components-react";
-import { ConnectionState, Track } from "livekit-client";
+import { ConnectionState } from "livekit-client";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Activity, Shield, Cpu, Zap, Signal, Mic, LogOut, ArrowLeft } from "lucide-react";
+import { Activity, Shield, Cpu, Zap, Signal, Mic, ArrowLeft, AlertCircle } from "lucide-react";
 
 export default function Home() {
   const [token, setToken] = useState("");
   const [url, setUrl] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   const onConnect = async () => {
+    setError(null);
+    setIsConnecting(true);
     try {
       const resp = await fetch("/api/token");
+      if (!resp.ok) {
+        throw new Error(`Failed to get token: ${resp.status}`);
+      }
       const data = await resp.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
       setToken(data.accessToken);
       setUrl(data.url);
     } catch (e) {
       console.error(e);
+      setError(e instanceof Error ? e.message : "Failed to connect. Please try again.");
+    } finally {
+      setIsConnecting(false);
     }
   };
 
@@ -82,14 +93,26 @@ export default function Home() {
               whileHover={{ scale: 1.05, boxShadow: "0 0 50px rgba(255,0,0,0.6)" }}
               whileTap={{ scale: 0.95 }}
               onClick={onConnect}
-              className="group relative px-20 py-8 overflow-hidden"
+              disabled={isConnecting}
+              className="group relative px-20 py-8 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="absolute inset-0 border-2 border-red-600" />
               <div className="absolute inset-0 bg-red-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               <span className="relative z-10 font-orbitron tracking-[0.4em] text-2xl uppercase group-hover:text-black transition-colors duration-300">
-                [ INITIALIZE ]
+                {isConnecting ? "[ CONNECTING... ]" : "[ INITIALIZE ]"}
               </span>
             </motion.button>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-3 bg-red-900/30 border border-red-500/50 rounded px-4 py-3 text-red-300"
+              >
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm font-rajdhani">{error}</span>
+              </motion.div>
+            )}
 
             <div className="pt-12 grid grid-cols-3 gap-8 opacity-40">
               <div className="flex flex-col items-center gap-2">

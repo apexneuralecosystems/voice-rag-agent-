@@ -1,19 +1,65 @@
 [Unit]
-Description=Voice Agent RAG - LiveKit Worker
-After=network.target
+Description=Voice Agent RAG - LiveKit Voice Assistant
+Documentation=https://github.com/your-repo/voice-rag-agent
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
-User=youruser
-WorkingDirectory=/path/to/Voice-Agent-RAG/backend
-Environment="PATH=/path/to/Voice-Agent-RAG/venv/bin"
-ExecStart=/path/to/Voice-Agent-RAG/venv/bin/python voice_agent_openai.py start
+# Update these paths for your deployment
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/voice-rag-agent/backend
+
+# Python virtual environment
+Environment="PATH=/opt/voice-rag-agent/venv/bin:/usr/local/bin:/usr/bin"
+Environment="PYTHONUNBUFFERED=1"
+Environment="PYTHONDONTWRITEBYTECODE=1"
+
+# Load environment variables from .env file
+EnvironmentFile=/opt/voice-rag-agent/.env
+
+# Start command
+ExecStart=/opt/voice-rag-agent/venv/bin/python voice_agent_openai.py start
+
+# Restart policy
 Restart=always
 RestartSec=10
+TimeoutStopSec=30
+
+# Resource limits (adjust based on your server)
+MemoryMax=4G
+CPUQuota=80%
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/voice-rag-agent/logs
+ReadWritePaths=/opt/voice-rag-agent/chat-engine-storage
 
 # Logging
 StandardOutput=append:/var/log/voice-agent/output.log
 StandardError=append:/var/log/voice-agent/error.log
+SyslogIdentifier=voice-agent
 
 [Install]
 WantedBy=multi-user.target
+
+# ============================================
+# Installation Instructions:
+# ============================================
+# 1. Edit paths above to match your deployment
+# 2. Create log directory:
+#    sudo mkdir -p /var/log/voice-agent
+#    sudo chown www-data:www-data /var/log/voice-agent
+# 3. Copy this file:
+#    sudo cp voice-agent.service /etc/systemd/system/
+# 4. Reload systemd:
+#    sudo systemctl daemon-reload
+# 5. Enable and start:
+#    sudo systemctl enable voice-agent
+#    sudo systemctl start voice-agent
+# 6. Check status:
+#    sudo systemctl status voice-agent
+#    sudo journalctl -u voice-agent -f
