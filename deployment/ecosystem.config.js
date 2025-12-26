@@ -51,13 +51,13 @@ module.exports = {
     },
 
     // ==========================================
-    // Frontend - Next.js Application
+    // Frontend - Next.js Application (Standalone Mode)
     // ==========================================
     {
       name: "voiceai-frontend",
-      script: "npm",
-      args: "start",
+      script: ".next/standalone/server.js",
       cwd: path.join(__dirname, "..", "frontend"),
+      interpreter: "node",
 
       // Environment
       env: {
